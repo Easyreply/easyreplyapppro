@@ -22,7 +22,7 @@ def add_user(data):
     ref.set({
         "name": data.get("name"),
         "password": data.get("password"),
-        "credits": int(data.get("credits", 0))
+        "credits": int(data.get("credits", 0))  # safe cast
     })
     return True
 
@@ -38,6 +38,9 @@ def update_user(original_mobile, updated_data):
         db.reference(f"users/{new_mobile}").set(updated_data)
         old_ref.delete()
     else:
+        # Ensure credits are stored as int
+        if "credits" in updated_data:
+            updated_data["credits"] = int(updated_data["credits"])
         old_ref.update(updated_data)
     return True
 
@@ -55,7 +58,12 @@ def check_login(mobile, password):
 
 def deduct_credit(mobile):
     ref = db.reference(f"users/{mobile}/credits")
-    current = ref.get() or 0
+    current = ref.get()
+    try:
+        current = int(current)
+    except (TypeError, ValueError):
+        return False
+
     if current > 0:
         ref.set(current - 1)
         return True
