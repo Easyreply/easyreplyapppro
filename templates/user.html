@@ -198,14 +198,21 @@
       })
       .then(res => res.json())
       .then(data => {
+        if (typeof data.credits === "number") {
+          document.getElementById("creditDisplay").innerText = data.credits + " Credits";
+
+          if (data.credits === 0) {
+            alert("⚠ You have no balance left.\n\nPlease contact admin on WhatsApp to add credits:\nhttps://wa.me/918830720742");
+            document.querySelector(".generate").disabled = true;
+            return;
+          }
+        }
+
         const replyBox = document.getElementById("replyBox");
         const replyText = document.getElementById("replyText");
         replyText.innerText = data.reply;
         replyBox.style.display = "block";
         replyBox.scrollIntoView({ behavior: 'smooth' });
-
-        // 🔁 Update credits in UI
-        document.getElementById("creditDisplay").innerText = data.credits + " Credits";
       })
       .catch(err => {
         alert("Something went wrong while generating the reply.");
