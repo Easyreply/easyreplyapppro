@@ -3,7 +3,7 @@ import os
 from utils import (
     check_login, get_user, get_all_users,
     add_user, update_user, delete_user,
-    generate_reply
+    generate_reply, deduct_credit
 )
 
 app = Flask(__name__)
@@ -22,6 +22,7 @@ def login():
             session["mobile"] = mobile
             session["username"] = user.get("name", "")
             session["is_admin"] = (mobile == ADMIN_MOBILE)
+            session["credits"] = user.get("credits", 0)
             return redirect("/admin" if mobile == ADMIN_MOBILE else f"/{user.get('name')}")
         else:
             error = "Invalid mobile number or password."
@@ -88,6 +89,13 @@ def user_dashboard(username):
 def generate_reply_route():
     if not session.get("mobile") or session.get("is_admin"):
         return jsonify({"error": "Unauthorized"}), 403
+
+    mobile = session["mobile"]
+    user = get_user(mobile)
+
+    if not user or int(user.get("credits", 0)) < 1:
+        return jsonify({"error": "Insufficient credits"}), 402
+
     data = request.get_json()
     reply = generate_reply(
         review_text=data.get("review_text", ""),
@@ -100,4 +108,12 @@ def generate_reply_route():
         cta_type=data.get("cta_type", ""),
         cta_link=data.get("cta_link", "")
     )
-    return jsonify({"reply": reply})
+
+    deduct_credit(mobile)  # 🔁 Deduct 1 credit after reply
+    updated_user = get_user(mobile)
+    session["credits"] = updated_user.get("credits", 0)
+
+    return jsonify({
+        "reply": reply,
+        "credits": session["credits"]
+    })
