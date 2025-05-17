@@ -119,7 +119,7 @@ def generate_reply(review_text, tone="Professional", reply_length="Medium",
             {"role": "user", "content": prompt}
         ],
         temperature=0.7,
-        max_tokens=400
+        max_tokens=700
     )
 
     return response['choices'][0]['message']['content'].strip()
