@@ -169,26 +169,24 @@
         return;
       }
 
-      const tone = document.getElementById("tone").value;
-      const businessName = document.getElementById("businessName").value;
-      const seoKeywords = document.getElementById("seoKeywords").value;
-      const replyLength = document.getElementById("replyLength").value;
-      const signature = document.getElementById("signature").value;
-      const ctaEnabled = document.getElementById("enableSocialCTA").checked;
+      const settingsEnabled = document.getElementById("showSettingsToggle").checked;
+      let payload = { review_text: review };
 
-      const payload = {
-        review_text: review,
-        tone: tone,
-        business_name: businessName,
-        seo_keywords: seoKeywords,
-        reply_length: replyLength,
-        signature: signature,
-        cta_enabled: ctaEnabled
-      };
+      if (settingsEnabled) {
+        payload.tone = document.getElementById("tone").value;
+        payload.business_name = document.getElementById("businessName").value;
+        payload.seo_keywords = document.getElementById("seoKeywords").value;
+        payload.reply_length = document.getElementById("replyLength").value;
+        payload.signature = document.getElementById("signature").value;
+        payload.cta_enabled = document.getElementById("enableSocialCTA").checked;
 
-      if (ctaEnabled) {
-        payload.cta_type = document.getElementById("ctaType").value;
-        payload.cta_link = document.getElementById("ctaLink").value;
+        if (payload.cta_enabled) {
+          payload.cta_type = document.getElementById("ctaType").value;
+          payload.cta_link = document.getElementById("ctaLink").value;
+        }
+      } else {
+        payload.tone = "Professional";
+        payload.reply_length = "Short";
       }
 
       fetch("/generate_reply", {
