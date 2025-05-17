@@ -14,6 +14,11 @@
       "name": "Priya",
       "password": "priya456",
       "credits": 15
+    },
+    "9876543212": {
+      "name": "Vikram",
+      "password": "vikram789",
+      "credits": 40
     }
   }
 }
