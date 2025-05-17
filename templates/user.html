@@ -159,15 +159,18 @@
     });
 
     function showReply() {
-      const review = document.getElementById("review").value;
+      const review = document.getElementById("review").value.trim();
+      if (!review) {
+        alert("❗ Please paste a review before generating a reply.");
+        return;
+      }
+
       const tone = document.getElementById("tone").value;
       const businessName = document.getElementById("businessName").value;
       const seoKeywords = document.getElementById("seoKeywords").value;
       const replyLength = document.getElementById("replyLength").value;
       const signature = document.getElementById("signature").value;
       const ctaEnabled = document.getElementById("enableSocialCTA").checked;
-      const ctaType = document.getElementById("ctaType").value;
-      const ctaLink = document.getElementById("ctaLink").value;
 
       const payload = {
         review_text: review,
@@ -176,10 +179,13 @@
         seo_keywords: seoKeywords,
         reply_length: replyLength,
         signature: signature,
-        cta_enabled: ctaEnabled,
-        cta_type: ctaType,
-        cta_link: ctaLink
+        cta_enabled: ctaEnabled
       };
+
+      if (ctaEnabled) {
+        payload.cta_type = document.getElementById("ctaType").value;
+        payload.cta_link = document.getElementById("ctaLink").value;
+      }
 
       fetch("/generate_reply", {
         method: "POST",
@@ -195,7 +201,7 @@
         replyBox.scrollIntoView({ behavior: 'smooth' });
       })
       .catch(err => {
-        alert("Something went wrong while generating reply.");
+        alert("Something went wrong while generating the reply.");
         console.error(err);
       });
     }
