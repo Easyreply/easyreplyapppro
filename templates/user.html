@@ -159,21 +159,45 @@
     });
 
     function showReply() {
-      const replyBox = document.getElementById("replyBox");
-      const text = document.getElementById("replyText");
-      let reply = "Thanks for your kind feedback! We're happy to serve you again. 🌟";
+      const review = document.getElementById("review").value;
+      const tone = document.getElementById("tone").value;
+      const businessName = document.getElementById("businessName").value;
+      const seoKeywords = document.getElementById("seoKeywords").value;
+      const replyLength = document.getElementById("replyLength").value;
+      const signature = document.getElementById("signature").value;
+      const ctaEnabled = document.getElementById("enableSocialCTA").checked;
+      const ctaType = document.getElementById("ctaType").value;
+      const ctaLink = document.getElementById("ctaLink").value;
 
-      const enableCTA = document.getElementById("enableSocialCTA").checked;
-      if (enableCTA) {
-        const ctaType = document.getElementById("ctaType").value;
-        const ctaLink = document.getElementById("ctaLink").value;
-        if (ctaLink) {
-          reply += `\n\n👉 ${ctaType}: ${ctaLink}`;
-        }
-      }
-      text.innerText = reply;
-      replyBox.style.display = "block";
-      replyBox.scrollIntoView({ behavior: 'smooth' });
+      const payload = {
+        review_text: review,
+        tone: tone,
+        business_name: businessName,
+        seo_keywords: seoKeywords,
+        reply_length: replyLength,
+        signature: signature,
+        cta_enabled: ctaEnabled,
+        cta_type: ctaType,
+        cta_link: ctaLink
+      };
+
+      fetch("/generate_reply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => {
+        const replyBox = document.getElementById("replyBox");
+        const replyText = document.getElementById("replyText");
+        replyText.innerText = data.reply;
+        replyBox.style.display = "block";
+        replyBox.scrollIntoView({ behavior: 'smooth' });
+      })
+      .catch(err => {
+        alert("Something went wrong while generating reply.");
+        console.error(err);
+      });
     }
 
     function clearReply() {
