@@ -94,7 +94,7 @@
       </form>
     </div>
     <div style="margin-top: 1rem; font-weight: 500;">Logged in as: <strong>{{ username }}</strong></div>
-    <div class="credits">{{ credits }} Credits</div>
+    <div class="credits" id="creditDisplay">{{ credits }} Credits</div>
     <div class="input-group">
       <label for="review">Paste your Business Review</label>
       <textarea id="review" placeholder="Google, Zomato, Tripadvisor, etc."></textarea>
@@ -203,6 +203,9 @@
         replyText.innerText = data.reply;
         replyBox.style.display = "block";
         replyBox.scrollIntoView({ behavior: 'smooth' });
+
+        // 🔁 Update credits in UI
+        document.getElementById("creditDisplay").innerText = data.credits + " Credits";
       })
       .catch(err => {
         alert("Something went wrong while generating the reply.");
