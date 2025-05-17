@@ -22,7 +22,7 @@ def add_user(data):
     ref.set({
         "name": data.get("name"),
         "password": data.get("password"),
-        "credits": int(data.get("credits", 0))
+        "credits": int(data.get("credits", 0))  # safe cast
     })
     return True
 
@@ -68,7 +68,17 @@ def deduct_credit(mobile):
         return True
     return False
 
-# ---------------- OPENAI PROMPT LOGIC ----------------
+# ---------------- SMART REPLY PROMPT LOGIC ----------------
+
+def get_length_instruction(length):
+    length = (length or "").lower()
+    if length == "short":
+        return "Keep the reply concise: maximum 2–3 sentences."
+    elif length == "medium":
+        return "Keep the reply informative: 4–6 sentences recommended."
+    elif length == "long":
+        return "You can elaborate more, up to 8+ sentences if needed."
+    return "Keep the reply clear and easy to read."
 
 def generate_reply(review_text, tone="Professional", reply_length="Short",
                    business_name="", seo_keywords="", signature="",
@@ -78,28 +88,29 @@ def generate_reply(review_text, tone="Professional", reply_length="Short",
         "You are a smart assistant that writes helpful, brand-safe, and human-like replies to customer reviews.",
         "",
         f"- Respond in a {tone.lower()} tone.",
-        f"- Keep the response {reply_length.lower()} in length.",
-        "- Understand the sentiment of the review (positive, neutral, or negative) and respond accordingly.",
+        f"- {get_length_instruction(reply_length)}",
+        "- Analyze the sentiment of the review (positive, neutral, negative) and adjust tone accordingly.",
+        "- If additional fields like business name, SEO keywords, or CTA are provided, include them only if they naturally fit into the reply length.",
     ]
 
     if business_name:
-        prompt_lines.append(f"- Mention the business name if helpful: {business_name}")
+        prompt_lines.append(f"- Mention business name if helpful: {business_name}")
     if seo_keywords:
-        prompt_lines.append(f"- Try to include these keywords naturally: {seo_keywords}")
+        prompt_lines.append(f"- Use SEO keywords naturally if possible: {seo_keywords}")
     if signature:
-        prompt_lines.append(f"- Add this signature at the end: {signature}")
+        prompt_lines.append(f"- Close with this signature if space allows: {signature}")
     if cta_enabled and cta_type and cta_link:
-        prompt_lines.append(f"- Include this CTA: {cta_type}: {cta_link}")
+        prompt_lines.append(f"- Add this CTA at the end if appropriate: {cta_type}: {cta_link}")
 
     prompt_lines += [
         "",
         "Constraints:",
-        "- Do not repeat the original review.",
-        "- Do not use templated formats or placeholders.",
+        "- Do not repeat the review text.",
         "- Do not ask follow-up questions.",
-        "- Always end with a complete sentence.",
+        "- Do not mention that you are an AI or assistant.",
+        "- End with a complete sentence. Avoid vague or generic sign-offs.",
         "",
-        f"Now write a reply to this customer review:\n\"{review_text}\""
+        f"Now write a reply to this review:\n\"{review_text}\""
     ]
 
     prompt = "\n".join(prompt_lines)
@@ -107,11 +118,11 @@ def generate_reply(review_text, tone="Professional", reply_length="Short",
     response = openai.ChatCompletion.create(
         model="gpt-4o",
         messages=[
-            {"role": "system", "content": "You're a professional review reply writer."},
+            {"role": "system", "content": "You are a professional review reply writer for businesses."},
             {"role": "user", "content": prompt}
         ],
         temperature=0.7,
-        max_tokens=600
+        max_tokens=700
     )
 
     return response['choices'][0]['message']['content'].strip()
