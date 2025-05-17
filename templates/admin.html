@@ -11,9 +11,30 @@
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(135deg, #f6f9fc, #e2e8f0);
       display: flex;
+      flex-direction: column;
       height: 100vh;
-      overflow: hidden;
       color: #1a202c;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+    }
+    .logout-btn {
+      background: #e53e3e;
+      color: white;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+      height: 100%;
     }
     .left, .right {
       padding: 2rem;
@@ -43,6 +64,7 @@
     th, td {
       padding: 0.8rem;
       border-bottom: 1px solid #edf2f7;
+      vertical-align: middle;
     }
     th {
       background: #f7fafc;
@@ -112,64 +134,83 @@
       border: none;
       border-radius: 12px;
     }
+    .message {
+      background: #d0f0d6;
+      color: #276749;
+      padding: 0.8rem 1rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      font-weight: 500;
+    }
     @media (max-width: 768px) {
-      body { flex-direction: column; }
+      .main {
+        flex-direction: column;
+      }
       .left, .right {
         width: 100%;
         padding: 1.2rem;
-      }
-      th, td input, .btn {
-        font-size: 0.9rem;
       }
     }
   </style>
 </head>
 <body>
-  <div class="left">
-    <h2>All Users</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Mobile</th>
-          <th>Password</th>
-          <th>Credits</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for mobile, user in users.items() %}
-        <tr>
-          <form method="POST" action="/update_user">
-            <td><input name="name" value="{{ user.name }}" /></td>
-            <td><input name="mobile" value="{{ mobile }}" /></td>
-            <td><input name="password" value="{{ user.password }}" /></td>
-            <td><input name="credits" type="number" value="{{ user.credits }}" /></td>
-            <td style="display:flex;">
-              <input type="hidden" name="original_mobile" value="{{ mobile }}">
-              <button class="btn edit-btn" type="submit">Save</button>
-          </form>
-          <form method="POST" action="/delete_user">
-            <input type="hidden" name="mobile" value="{{ mobile }}">
-            <button class="btn delete-btn" type="submit">Delete</button>
-          </form>
-            </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+  <header>
+    <h2>EasyReply Admin</h2>
+    <form action="/logout" method="POST">
+      <button class="logout-btn">Logout</button>
+    </form>
+  </header>
 
-  <div class="right">
-    <div class="add-form">
-      <h3>Add New User</h3>
-      <form method="POST" action="/add_user">
-        <input type="text" name="name" placeholder="Name" required />
-        <input type="text" name="mobile" placeholder="Mobile Number" required />
-        <input type="password" name="password" placeholder="Password" required />
-        <input type="number" name="credits" placeholder="Credits" required />
-        <button type="submit" class="btn add-btn">Add User</button>
-      </form>
+  <div class="main">
+    <div class="left">
+      <h2>All Users</h2>
+      {% if request.args.get('msg') %}
+        <div class="message">{{ request.args.get('msg') }}</div>
+      {% endif %}
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Mobile</th>
+            <th>Password</th>
+            <th>Credits</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for mobile, user in users.items() %}
+          <tr>
+            <form method="POST" action="/update_user">
+              <td><input name="name" value="{{ user.name }}" /></td>
+              <td><input name="mobile" value="{{ mobile }}" /></td>
+              <td><input name="password" value="{{ user.password }}" /></td>
+              <td><input name="credits" type="number" value="{{ user.credits }}" /></td>
+              <td style="display:flex;">
+                <input type="hidden" name="original_mobile" value="{{ mobile }}">
+                <button class="btn edit-btn" type="submit">Save</button>
+            </form>
+            <form method="POST" action="/delete_user">
+              <input type="hidden" name="mobile" value="{{ mobile }}">
+              <button class="btn delete-btn" type="submit">Delete</button>
+            </form>
+              </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="right">
+      <div class="add-form">
+        <h3>Add New User</h3>
+        <form method="POST" action="/add_user">
+          <input type="text" name="name" placeholder="Name" required />
+          <input type="text" name="mobile" placeholder="Mobile Number" required />
+          <input type="password" name="password" placeholder="Password" required />
+          <input type="number" name="credits" placeholder="Credits" required />
+          <button type="submit" class="btn add-btn">Add User</button>
+        </form>
+      </div>
     </div>
   </div>
 </body>
