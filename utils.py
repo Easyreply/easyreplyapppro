@@ -53,6 +53,14 @@ def check_login(mobile, password):
         return user
     return None
 
+def deduct_credit(mobile):
+    ref = db.reference(f"users/{mobile}/credits")
+    current = ref.get() or 0
+    if current > 0:
+        ref.set(current - 1)
+        return True
+    return False
+
 # ---------------- OPENAI PROMPT LOGIC ----------------
 PROMPT_TEMPLATE = """
 You are a smart business assistant that writes helpful and brand-safe replies to customer reviews.
@@ -60,7 +68,11 @@ You are a smart business assistant that writes helpful and brand-safe replies to
 Your responsibilities:
 1. Understand the sentiment of the review: is it positive, neutral, or negative?
 2. Based on that, adjust your opening and tone while staying aligned with the desired tone: **{tone}**
-3. Reply length should be: **{reply_length}**. If not provided, default to medium.
+3. Reply length should be: **{reply_length}**.
+   Use these guidelines:
+   - Short: 20–40 words
+   - Medium: 50–80 words
+   - Long: 80–120 words
 4. You may mention the business name if provided: **{business_name}**
 5. Use these SEO keywords naturally if provided: **{seo_keywords}**
 6. Add this signature at the end if available: **{signature}**
@@ -93,7 +105,7 @@ def generate_reply(review_text, tone="Professional", reply_length="Medium",
     )
 
     response = openai.ChatCompletion.create(
-        model="gpt-4o",  # using GPT-4o as requested
+        model="gpt-4o",
         messages=[
             {"role": "system", "content": "You're a professional reply writer for reviews."},
             {"role": "user", "content": prompt}
