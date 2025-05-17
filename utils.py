@@ -22,7 +22,7 @@ def add_user(data):
     ref.set({
         "name": data.get("name"),
         "password": data.get("password"),
-        "credits": int(data.get("credits", 0))  # safe cast
+        "credits": int(data.get("credits", 0))
     })
     return True
 
@@ -38,7 +38,6 @@ def update_user(original_mobile, updated_data):
         db.reference(f"users/{new_mobile}").set(updated_data)
         old_ref.delete()
     else:
-        # Ensure credits are stored as int
         if "credits" in updated_data:
             updated_data["credits"] = int(updated_data["credits"])
         old_ref.update(updated_data)
@@ -70,50 +69,49 @@ def deduct_credit(mobile):
     return False
 
 # ---------------- OPENAI PROMPT LOGIC ----------------
-PROMPT_TEMPLATE = """
-You are a smart assistant that writes helpful, human-like replies to customer reviews.
 
-Instructions:
-- Understand the sentiment of the review (positive, neutral, negative)
-- Reply in the desired tone: **{tone}**
-- Reply length: {reply_length} (short, medium, or long — adjust naturally)
-- Mention business name if provided: **{business_name}**
-- Optionally use SEO keywords: **{seo_keywords}**
-- Add reply signature at the end if available: **{signature}**
-- If CTA is enabled, add at the end: **{cta_type}: {cta_link}**
-
-Constraints:
-- Don't repeat the original review
-- Don't mention you're an AI
-- Keep replies human, natural, and brand-safe
-- Always end with a complete sentence
-
-Now write a reply to this review:
-"{review_text}"
-"""
-
-def generate_reply(review_text, tone="Professional", reply_length="Medium",
+def generate_reply(review_text, tone="Professional", reply_length="Short",
                    business_name="", seo_keywords="", signature="",
                    cta_enabled=False, cta_type="", cta_link=""):
-    prompt = PROMPT_TEMPLATE.format(
-        tone=tone,
-        reply_length=reply_length,
-        business_name=business_name,
-        seo_keywords=seo_keywords,
-        signature=signature,
-        cta_type=cta_type,
-        cta_link=cta_link,
-        review_text=review_text
-    )
+
+    prompt_lines = [
+        "You are a smart assistant that writes helpful, brand-safe, and human-like replies to customer reviews.",
+        "",
+        f"- Respond in a {tone.lower()} tone.",
+        f"- Keep the response {reply_length.lower()} in length.",
+        "- Understand the sentiment of the review (positive, neutral, or negative) and respond accordingly.",
+    ]
+
+    if business_name:
+        prompt_lines.append(f"- Mention the business name if helpful: {business_name}")
+    if seo_keywords:
+        prompt_lines.append(f"- Try to include these keywords naturally: {seo_keywords}")
+    if signature:
+        prompt_lines.append(f"- Add this signature at the end: {signature}")
+    if cta_enabled and cta_type and cta_link:
+        prompt_lines.append(f"- Include this CTA: {cta_type}: {cta_link}")
+
+    prompt_lines += [
+        "",
+        "Constraints:",
+        "- Do not repeat the original review.",
+        "- Do not use templated formats or placeholders.",
+        "- Do not ask follow-up questions.",
+        "- Always end with a complete sentence.",
+        "",
+        f"Now write a reply to this customer review:\n\"{review_text}\""
+    ]
+
+    prompt = "\n".join(prompt_lines)
 
     response = openai.ChatCompletion.create(
         model="gpt-4o",
         messages=[
-            {"role": "system", "content": "You're a professional reply writer for reviews."},
+            {"role": "system", "content": "You're a professional review reply writer."},
             {"role": "user", "content": prompt}
         ],
         temperature=0.7,
-        max_tokens=400
+        max_tokens=600
     )
 
     return response['choices'][0]['message']['content'].strip()
