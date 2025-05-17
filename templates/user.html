@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EasyReply - Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #f6f9fc, #e2e8f0);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      color: #1a202c;
+    }
+    .left, .right { padding: 2rem; overflow-y: auto; }
+    .left {
+      width: 50%;
+      background: #ffffff;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.06);
+      border-radius: 0 24px 24px 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .right { width: 50%; background: #fcfcfd; }
+    .header { display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-size: 1.8rem; font-weight: 700; color: #2b6cb0; }
+    .logout {
+      background: #fff; color: #e53e3e; border: 2px solid #e53e3e;
+      padding: 0.45rem 1rem; border-radius: 10px;
+      font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s;
+    }
+    .logout:hover { background: #e53e3e; color: white; }
+    .credits {
+      background: #ebf4ff; color: #2c5282; font-weight: 600;
+      padding: 0.4rem 0.9rem; border-radius: 8px; font-size: 0.9rem;
+      margin: 1rem 0; width: fit-content;
+    }
+    label { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.4rem; display: block; color: #2d3748; }
+    .input-group { margin-bottom: 1.5rem; }
+    textarea, input[type="text"], select {
+      width: 100%; padding: 1rem; background: #f9fafb; border: 2px solid #cbd5e0;
+      border-radius: 12px; font-size: 1rem; font-family: 'Poppins', sans-serif;
+      transition: all 0.3s ease; color: #2d3748;
+    }
+    textarea:focus, input:focus, select:focus {
+      border-color: #7f56d9;
+      box-shadow: 0 0 0 4px rgba(127, 86, 217, 0.2);
+      outline: none;
+    }
+    textarea { min-height: 140px; resize: vertical; }
+    .btn {
+      width: 100%; padding: 1rem; border-radius: 12px;
+      font-size: 1.05rem; font-weight: 600; cursor: pointer;
+      border: none; font-family: 'Poppins', sans-serif;
+      transition: all 0.3s ease;
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08); }
+    .generate { background: linear-gradient(135deg, #805ad5, #6b46c1); color: white; }
+    .clear { background-color: #f1f5f9; color: #2d3748; }
+    .reply-box {
+      background: #ffffff; border: 1px solid #e2e8f0;
+      border-radius: 14px; padding: 1.4rem; margin-top: 2rem;
+      animation: fadeIn 0.5s ease; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+    }
+    .reply-header {
+      display: flex; justify-content: space-between; align-items: center;
+      font-weight: 600; margin-bottom: 1rem; font-size: 1rem; color: #2d3748;
+    }
+    .copy-btn {
+      background: #edf2f7; color: #4a5568; border: none;
+      padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.85rem;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .copy-btn.copied { background-color: #d0f0d6; color: #2f855a; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      .left, .right { width: 100%; padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="left">
+    <div class="header">
+      <div class="logo">EasyReply</div>
+      <form action="/logout" method="POST">
+        <button class="logout">Logout</button>
+      </form>
+    </div>
+    <div style="margin-top: 1rem; font-weight: 500;">Logged in as: <strong>{{ username }}</strong></div>
+    <div class="credits">{{ credits }} Credits</div>
+    <div class="input-group">
+      <label for="review">Paste your Business Review</label>
+      <textarea id="review" placeholder="Google, Zomato, Tripadvisor, etc."></textarea>
+    </div>
+    <div class="input-group">
+      <label for="tone">Reply Tone</label>
+      <select id="tone">
+        <option>Professional</option>
+        <option>Friendly</option>
+        <option>Polite</option>
+        <option>Apologetic</option>
+        <option>Thankful</option>
+        <option>Appreciative</option>
+        <option>Encouraging</option>
+      </select>
+    </div>
+    <button class="btn generate" onclick="showReply()">Generate Reply</button>
+    <div style="margin-bottom: 1rem;"></div>
+    <button class="btn clear" onclick="clearReply()">Clear</button>
+    <div id="replyBox" class="reply-box" style="display: none;">
+      <div class="reply-header">
+        <strong>🧠 Generated Reply</strong>
+        <button onclick="copyReply(this)" class="copy-btn" id="copyBtn">📋 Copy</button>
+      </div>
+      <p id="replyText"></p>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="input-group">
+      <label style="font-size: 1.4rem; font-weight: 700; color: #4a5568;">Show Advanced Settings</label>
+      <div style="margin-top: 0.5rem;">
+        <input type="checkbox" id="showSettingsToggle" checked /> Enable
+      </div>
+    </div>
+    <div id="settingsPanel">
+      <div class="input-group"><label for="businessName">Business Name</label><input type="text" id="businessName" /></div>
+      <div class="input-group"><label for="seoKeywords">SEO Keywords</label><input type="text" id="seoKeywords" /></div>
+      <div class="input-group"><label for="replyLength">Reply Length</label>
+        <select id="replyLength"><option>Short</option><option selected>Medium</option><option>Long</option></select>
+      </div>
+      <div class="input-group"><label for="signature">Reply Signature</label><input type="text" id="signature" /></div>
+      <div class="input-group"><label>Enable Social CTA</label>
+        <input type="checkbox" id="enableSocialCTA" />
+      </div>
+      <div class="input-group"><label for="ctaType">Social CTA Message</label>
+        <select id="ctaType">
+          <option>Follow us on Instagram</option>
+          <option>Like our Facebook Page</option>
+          <option>Subscribe to our YouTube Channel</option>
+          <option>Visit our Website</option>
+        </select>
+      </div>
+      <div class="input-group"><label for="ctaLink">CTA Link</label><input type="text" id="ctaLink" /></div>
+      <button class="btn generate" onclick="saveSettings()">Save Settings</button>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("showSettingsToggle").addEventListener("change", () => {
+      document.getElementById("settingsPanel").style.display = showSettingsToggle.checked ? "block" : "none";
+    });
+
+    function showReply() {
+      const replyBox = document.getElementById("replyBox");
+      const text = document.getElementById("replyText");
+      let reply = "Thanks for your kind feedback! We're happy to serve you again. 🌟";
+
+      const enableCTA = document.getElementById("enableSocialCTA").checked;
+      if (enableCTA) {
+        const ctaType = document.getElementById("ctaType").value;
+        const ctaLink = document.getElementById("ctaLink").value;
+        if (ctaLink) {
+          reply += `\n\n👉 ${ctaType}: ${ctaLink}`;
+        }
+      }
+      text.innerText = reply;
+      replyBox.style.display = "block";
+      replyBox.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function clearReply() {
+      document.getElementById("review").value = "";
+      document.getElementById("replyBox").style.display = "none";
+    }
+
+    function copyReply(btn) {
+      const text = document.getElementById("replyText").innerText;
+      navigator.clipboard.writeText(text);
+      btn.innerText = "✅ Copied";
+      btn.classList.add("copied");
+      setTimeout(() => {
+        btn.innerText = "📋 Copy";
+        btn.classList.remove("copied");
+      }, 2000);
+    }
+
+    function saveSettings() {
+      const ids = ["businessName", "seoKeywords", "replyLength", "signature", "enableSocialCTA", "ctaType", "ctaLink"];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) localStorage.setItem(id, el.type === "checkbox" ? el.checked : el.value);
+      });
+      alert("✅ Settings saved!");
+    }
+  </script>
+</body>
+</html>
