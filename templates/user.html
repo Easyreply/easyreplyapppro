@@ -81,7 +81,6 @@
       margin-top: 1rem;
       display: none;
     }
-
     .spinner {
       display: inline-block;
       width: 32px;
@@ -91,17 +90,14 @@
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
-
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-
     @media (max-width: 768px) {
       body { flex-direction: column; }
       .left, .right { width: 100%; padding: 1.5rem; }
@@ -138,10 +134,7 @@
     <div style="margin-bottom: 1rem;"></div>
     <button class="btn clear" onclick="clearReply()">Clear</button>
 
-    <!-- ✅ Spinner container -->
-    <div id="loadingSpinner">
-      <div class="spinner"></div>
-    </div>
+    <div id="loadingSpinner"><div class="spinner"></div></div>
 
     <div id="replyBox" class="reply-box" style="display: none;">
       <div class="reply-header">
@@ -161,7 +154,6 @@
     </div>
     <div id="settingsPanel">
       <div class="input-group"><label for="businessName">Business Name</label><input type="text" id="businessName" /></div>
-
       <div class="input-group">
         <label for="businessCategory">Business Type</label>
         <select id="businessCategory">
@@ -176,7 +168,6 @@
           <option>Real Estate</option>
         </select>
       </div>
-
       <div class="input-group"><label for="replyLength">Reply Length</label>
         <select id="replyLength">
           <option selected>Short</option>
@@ -213,7 +204,9 @@
         return;
       }
 
-      document.getElementById("loadingSpinner").style.display = "block";
+      const spinner = document.getElementById("loadingSpinner");
+      spinner.style.display = "block";
+      spinner.scrollIntoView({ behavior: "smooth", block: "center" });
 
       const settingsEnabled = document.getElementById("showSettingsToggle").checked;
       let payload = { review_text: review };
@@ -242,11 +235,10 @@
       })
       .then(res => res.json())
       .then(data => {
-        document.getElementById("loadingSpinner").style.display = "none";
+        spinner.style.display = "none";
 
         if (typeof data.credits === "number") {
           document.getElementById("creditDisplay").innerText = data.credits + " Credits";
-
           if (data.credits === 0) {
             alert("⚠ You have no balance left.\n\nPlease contact admin on WhatsApp to add credits:\nhttps://wa.me/918830720742");
             document.querySelector(".generate").disabled = true;
@@ -261,7 +253,7 @@
         replyBox.scrollIntoView({ behavior: 'smooth' });
       })
       .catch(err => {
-        document.getElementById("loadingSpinner").style.display = "none";
+        spinner.style.display = "none";
         alert("Something went wrong while generating the reply.");
         console.error(err);
       });
