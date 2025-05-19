@@ -132,11 +132,24 @@
     </div>
     <div id="settingsPanel">
       <div class="input-group"><label for="businessName">Business Name</label><input type="text" id="businessName" /></div>
-     <div class="input-group">
-  <label for="seoKeywords">Key Phrases (SEO-friendly)</label>
-  <input type="text" id="seoKeywords" placeholder="e.g., modern sofa, Koramangala, handcrafted furniture" />
-  <small style="font-size: 0.85rem; color: #718096;">Helps make your reply more discoverable in search.</small>
-</div>
+
+      <div class="input-group">
+        <label for="businessCategory">Business Type</label>
+        <select id="businessCategory">
+          <option selected disabled>Select your business</option>
+          <option>Restaurant</option>
+          <option>Hotel</option>
+          <option>Retail Shop</option>
+          <option>Clinic</option>
+          <option>Freelancer</option>
+          <option>Online Store</option>
+          <option>Salon</option>
+          <option>Education</option>
+          <option>Real Estate</option>
+          <option>General Business</option>
+        </select>
+      </div>
+
       <div class="input-group"><label for="replyLength">Reply Length</label>
         <select id="replyLength">
           <option selected>Short</option>
@@ -179,7 +192,7 @@
       if (settingsEnabled) {
         payload.tone = document.getElementById("tone").value;
         payload.business_name = document.getElementById("businessName").value;
-        payload.seo_keywords = document.getElementById("seoKeywords").value;
+        payload.business_category = document.getElementById("businessCategory").value;
         payload.reply_length = document.getElementById("replyLength").value;
         payload.signature = document.getElementById("signature").value;
         payload.cta_enabled = document.getElementById("enableSocialCTA").checked;
@@ -239,7 +252,7 @@
     }
 
     function saveSettings() {
-      const ids = ["businessName", "seoKeywords", "replyLength", "signature", "enableSocialCTA", "ctaType", "ctaLink"];
+      const ids = ["businessName", "businessCategory", "replyLength", "signature", "enableSocialCTA", "ctaType", "ctaLink"];
       ids.forEach(id => {
         const el = document.getElementById(id);
         if (el) localStorage.setItem(id, el.type === "checkbox" ? el.checked : el.value);
