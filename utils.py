@@ -96,7 +96,7 @@ def generate_reply(review_text, tone="Professional", reply_length="Short",
     if business_name:
         prompt_lines.append(f"- Mention business name if helpful: {business_name}")
     if seo_keywords:
-        prompt_lines.append(f"- Use SEO keywords naturally if possible: {seo_keywords}")
+        prompt_lines.append(f"- Try to include these key phrases if appropriate: {seo_keywords}")
     if signature:
         prompt_lines.append(f"- Close with this signature if space allows: {signature}")
     if cta_enabled and cta_type and cta_link:
