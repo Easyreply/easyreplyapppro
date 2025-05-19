@@ -102,14 +102,14 @@ def generate_reply_route():
         tone=data.get("tone", "Professional"),
         reply_length=data.get("reply_length", "Medium"),
         business_name=data.get("business_name", ""),
-        seo_keywords=data.get("seo_keywords", ""),
         signature=data.get("signature", ""),
         cta_enabled=data.get("cta_enabled", False),
         cta_type=data.get("cta_type", ""),
-        cta_link=data.get("cta_link", "")
+        cta_link=data.get("cta_link", ""),
+        business_category=data.get("business_category", "")  # ✅ Added this
     )
 
-    deduct_credit(mobile)  # 🔁 Deduct 1 credit after reply
+    deduct_credit(mobile)
     updated_user = get_user(mobile)
     session["credits"] = updated_user.get("credits", 0)
 
