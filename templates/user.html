@@ -1,3 +1,4 @@
+<!-- ✅ COPY FROM HERE -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,20 +8,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
+    body {
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(135deg, #f6f9fc, #e2e8f0);
-      height: 100%;
-      overflow: auto;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
       color: #1a202c;
-    }
-    body {
-      display: flex;
-      flex-direction: column;
-    }
-    .container {
-      display: flex;
-      height: 100%;
     }
     .left, .right { padding: 2rem; overflow-y: auto; }
     .left {
@@ -82,11 +76,13 @@
       cursor: pointer; transition: all 0.2s;
     }
     .copy-btn.copied { background-color: #d0f0d6; color: #2f855a; }
+
     #loadingSpinner {
       text-align: center;
       margin-top: 1rem;
       display: none;
     }
+
     .spinner {
       display: inline-block;
       width: 32px;
@@ -96,114 +92,116 @@
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+
     @media (max-width: 768px) {
-      .container { flex-direction: column; }
+      body { flex-direction: column; overflow-y: auto; height: auto; }
       .left, .right { width: 100%; padding: 1.5rem; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="left">
-      <div class="header">
-        <div class="logo">EasyReply</div>
-        <form action="/logout" method="POST">
-          <button class="logout">Logout</button>
-        </form>
-      </div>
-      <div style="margin-top: 1rem; font-weight: 500;">Logged in as: <strong>{{ username }}</strong></div>
-      <div class="credits" id="creditDisplay">{{ credits }} Credits</div>
-      <div class="input-group">
-        <label for="review">Paste your Business Review</label>
-        <textarea id="review" placeholder="Google, Zomato, Tripadvisor, etc."></textarea>
-      </div>
-      <div class="input-group">
-        <label for="tone">Reply Tone</label>
-        <select id="tone">
-          <option>Professional</option>
-          <option>Friendly</option>
-          <option>Polite</option>
-          <option>Apologetic</option>
-          <option>Thankful</option>
-          <option>Appreciative</option>
-          <option>Encouraging</option>
-        </select>
-      </div>
-      <button class="btn generate" onclick="showReply()">Generate Reply</button>
-      <div style="margin-bottom: 1rem;"></div>
-      <button class="btn clear" onclick="clearReply()">Clear</button>
-      <div id="loadingSpinner">
-        <div class="spinner"></div>
-      </div>
-      <div id="replyBox" class="reply-box" style="display: none;">
-        <div class="reply-header">
-          <strong>🧠 Generated Reply</strong>
-          <button onclick="copyReply(this)" class="copy-btn" id="copyBtn">📋 Copy</button>
-        </div>
-        <p id="replyText"></p>
-      </div>
+  <div class="left">
+    <div class="header">
+      <div class="logo">EasyReply</div>
+      <form action="/logout" method="POST">
+        <button class="logout">Logout</button>
+      </form>
+    </div>
+    <div style="margin-top: 1rem; font-weight: 500;">Logged in as: <strong>{{ username }}</strong></div>
+    <div class="credits" id="creditDisplay">{{ credits }} Credits</div>
+    <div class="input-group">
+      <label for="review">Paste your Business Review</label>
+      <textarea id="review" placeholder="Google, Zomato, Tripadvisor, etc."></textarea>
+    </div>
+    <div class="input-group">
+      <label for="tone">Reply Tone</label>
+      <select id="tone">
+        <option>Professional</option>
+        <option>Friendly</option>
+        <option>Polite</option>
+        <option>Apologetic</option>
+        <option>Thankful</option>
+        <option>Appreciative</option>
+        <option>Encouraging</option>
+      </select>
+    </div>
+    <button class="btn generate" onclick="showReply()">Generate Reply</button>
+    <div style="margin-bottom: 1rem;"></div>
+    <button class="btn clear" onclick="clearReply()">Clear</button>
+
+    <div id="loadingSpinner">
+      <div class="spinner"></div>
     </div>
 
-    <div class="right">
-      <div class="input-group">
-        <label style="font-size: 1.4rem; font-weight: 700; color: #4a5568;">Show Advanced Settings</label>
-        <div style="margin-top: 0.5rem;">
-          <input type="checkbox" id="showSettingsToggle" checked /> Enable
-        </div>
+    <div id="replyBox" class="reply-box" style="display: none;">
+      <div class="reply-header">
+        <strong>🧠 Generated Reply</strong>
+        <button onclick="copyReply(this)" class="copy-btn" id="copyBtn">📋 Copy</button>
       </div>
-      <div id="settingsPanel">
-        <div class="input-group"><label for="businessName">Business Name</label><input type="text" id="businessName" /></div>
-        <div class="input-group">
-          <label for="businessCategory">Business Type</label>
-          <select id="businessCategory">
-            <option selected disabled>Select your business</option>
-            <option>Restaurant</option>
-            <option>Hotel</option>
-            <option>Retail Shop</option>
-            <option>Clinic</option>
-            <option>Online Store</option>
-            <option>Salon</option>
-            <option>Education</option>
-            <option>Real Estate</option>
-          </select>
-        </div>
-        <div class="input-group"><label for="replyLength">Reply Length</label>
-          <select id="replyLength">
-            <option selected>Short</option>
-            <option>Medium</option>
-            <option>Long</option>
-          </select>
-        </div>
-        <div class="input-group"><label for="signature">Reply Signature</label><input type="text" id="signature" /></div>
-        <div class="input-group"><label>Enable Social CTA</label>
-          <input type="checkbox" id="enableSocialCTA" />
-        </div>
-        <div class="input-group"><label for="ctaType">Social CTA Message</label>
-          <select id="ctaType">
-            <option>Follow us on Instagram</option>
-            <option>Like our Facebook Page</option>
-            <option>Subscribe to our YouTube Channel</option>
-            <option>Visit our Website</option>
-          </select>
-        </div>
-        <div class="input-group"><label for="ctaLink">CTA Link</label><input type="text" id="ctaLink" /></div>
-        <button class="btn generate" onclick="saveSettings()">Save Settings</button>
-      </div>
+      <p id="replyText"></p>
     </div>
   </div>
+
+  <div class="right">
+    <div class="input-group">
+      <label style="font-size: 1.4rem; font-weight: 700; color: #4a5568;">Show Advanced Settings</label>
+      <div style="margin-top: 0.5rem;">
+        <input type="checkbox" id="showSettingsToggle" checked /> Enable
+      </div>
+    </div>
+    <div id="settingsPanel">
+      <div class="input-group"><label for="businessName">Business Name</label><input type="text" id="businessName" /></div>
+      <div class="input-group">
+        <label for="businessCategory">Business Type</label>
+        <select id="businessCategory">
+          <option selected disabled>Select your business</option>
+          <option>Restaurant</option>
+          <option>Hotel</option>
+          <option>Retail Shop</option>
+          <option>Clinic</option>
+          <option>Online Store</option>
+          <option>Salon</option>
+          <option>Education</option>
+          <option>Real Estate</option>
+        </select>
+      </div>
+      <div class="input-group"><label for="replyLength">Reply Length</label>
+        <select id="replyLength">
+          <option selected>Short</option>
+          <option>Medium</option>
+          <option>Long</option>
+        </select>
+      </div>
+      <div class="input-group"><label for="signature">Reply Signature</label><input type="text" id="signature" /></div>
+      <div class="input-group"><label>Enable Social CTA</label>
+        <input type="checkbox" id="enableSocialCTA" />
+      </div>
+      <div class="input-group"><label for="ctaType">Social CTA Message</label>
+        <select id="ctaType">
+          <option>Follow us on Instagram</option>
+          <option>Like our Facebook Page</option>
+          <option>Subscribe to our YouTube Channel</option>
+          <option>Visit our Website</option>
+        </select>
+      </div>
+      <div class="input-group"><label for="ctaLink">CTA Link</label><input type="text" id="ctaLink" /></div>
+      <button class="btn generate" onclick="saveSettings()">Save Settings</button>
+    </div>
+  </div>
+
   <script>
     document.getElementById("showSettingsToggle").addEventListener("change", () => {
-      const panel = document.getElementById("settingsPanel");
-      panel.style.display = showSettingsToggle.checked ? "block" : "none";
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      document.getElementById("settingsPanel").style.display = showSettingsToggle.checked ? "block" : "none";
     });
 
     function showReply() {
@@ -214,6 +212,7 @@
       }
 
       document.getElementById("loadingSpinner").style.display = "block";
+      document.getElementById("loadingSpinner").scrollIntoView({ behavior: "smooth" });
 
       const settingsEnabled = document.getElementById("showSettingsToggle").checked;
       let payload = { review_text: review };
@@ -225,7 +224,6 @@
         payload.reply_length = document.getElementById("replyLength").value;
         payload.signature = document.getElementById("signature").value;
         payload.cta_enabled = document.getElementById("enableSocialCTA").checked;
-
         if (payload.cta_enabled) {
           payload.cta_type = document.getElementById("ctaType").value;
           payload.cta_link = document.getElementById("ctaLink").value;
@@ -240,31 +238,31 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       })
-        .then(res => res.json())
-        .then(data => {
-          document.getElementById("loadingSpinner").style.display = "none";
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("loadingSpinner").style.display = "none";
 
-          if (typeof data.credits === "number") {
-            document.getElementById("creditDisplay").innerText = data.credits + " Credits";
+        if (typeof data.credits === "number") {
+          document.getElementById("creditDisplay").innerText = data.credits + " Credits";
 
-            if (data.credits === 0) {
-              alert("⚠ You have no balance left.\n\nPlease contact admin on WhatsApp to add credits:\nhttps://wa.me/918830720742");
-              document.querySelector(".generate").disabled = true;
-              return;
-            }
+          if (data.credits === 0) {
+            alert("⚠ You have no balance left.\n\nPlease contact admin on WhatsApp to add credits:\nhttps://wa.me/918830720742");
+            document.querySelector(".generate").disabled = true;
+            return;
           }
+        }
 
-          const replyBox = document.getElementById("replyBox");
-          const replyText = document.getElementById("replyText");
-          replyText.innerText = data.reply;
-          replyBox.style.display = "block";
-          replyBox.scrollIntoView({ behavior: 'smooth' });
-        })
-        .catch(err => {
-          document.getElementById("loadingSpinner").style.display = "none";
-          alert("Something went wrong while generating the reply.");
-          console.error(err);
-        });
+        const replyBox = document.getElementById("replyBox");
+        const replyText = document.getElementById("replyText");
+        replyText.innerText = data.reply;
+        replyBox.style.display = "block";
+        replyBox.scrollIntoView({ behavior: 'smooth' });
+      })
+      .catch(err => {
+        document.getElementById("loadingSpinner").style.display = "none";
+        alert("Something went wrong while generating the reply.");
+        console.error(err);
+      });
     }
 
     function clearReply() {
@@ -294,3 +292,4 @@
   </script>
 </body>
 </html>
+<!-- ✅ END -->
