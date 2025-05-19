@@ -75,10 +75,33 @@
       cursor: pointer; transition: all 0.2s;
     }
     .copy-btn.copied { background-color: #d0f0d6; color: #2f855a; }
+
+    #loadingSpinner {
+      text-align: center;
+      margin-top: 1rem;
+      display: none;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 32px;
+      height: 32px;
+      border: 3px solid #cbd5e0;
+      border-top: 3px solid #6b46c1;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
     @media (max-width: 768px) {
       body { flex-direction: column; }
       .left, .right { width: 100%; padding: 1.5rem; }
@@ -114,6 +137,12 @@
     <button class="btn generate" onclick="showReply()">Generate Reply</button>
     <div style="margin-bottom: 1rem;"></div>
     <button class="btn clear" onclick="clearReply()">Clear</button>
+
+    <!-- ✅ Spinner container -->
+    <div id="loadingSpinner">
+      <div class="spinner"></div>
+    </div>
+
     <div id="replyBox" class="reply-box" style="display: none;">
       <div class="reply-header">
         <strong>🧠 Generated Reply</strong>
@@ -184,6 +213,8 @@
         return;
       }
 
+      document.getElementById("loadingSpinner").style.display = "block";
+
       const settingsEnabled = document.getElementById("showSettingsToggle").checked;
       let payload = { review_text: review };
 
@@ -211,6 +242,8 @@
       })
       .then(res => res.json())
       .then(data => {
+        document.getElementById("loadingSpinner").style.display = "none";
+
         if (typeof data.credits === "number") {
           document.getElementById("creditDisplay").innerText = data.credits + " Credits";
 
@@ -228,6 +261,7 @@
         replyBox.scrollIntoView({ behavior: 'smooth' });
       })
       .catch(err => {
+        document.getElementById("loadingSpinner").style.display = "none";
         alert("Something went wrong while generating the reply.");
         console.error(err);
       });
