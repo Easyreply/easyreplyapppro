@@ -1,4 +1,3 @@
-<!-- ✅ COPY FROM HERE -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -76,7 +75,10 @@
       cursor: pointer; transition: all 0.2s;
     }
     .copy-btn.copied { background-color: #d0f0d6; color: #2f855a; }
-
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
     @media (max-width: 768px) {
       body { flex-direction: column; overflow-y: auto; height: auto; }
       .left, .right { width: 100%; padding: 1.5rem; }
@@ -112,11 +114,10 @@
     <button class="btn generate" onclick="showReply()">Generate Reply</button>
     <div style="margin-bottom: 1rem;"></div>
     <button class="btn clear" onclick="clearReply()">Clear</button>
-
+    <!-- ✅ Loading Spinner Centered -->
     <div id="loadingSpinner" style="text-align:center; margin-top:1rem; display:none;">
       <div class="spinner" style="width:32px; height:32px; border:3px solid #cbd5e0; border-top:3px solid #6b46c1; border-radius:50%; animation:spin 1s linear infinite;"></div>
     </div>
-
     <div id="replyBox" class="reply-box" style="display: none;">
       <div class="reply-header">
         <strong>🧠 Generated Reply (SEO Friendly)</strong>
@@ -125,7 +126,6 @@
       <p id="replyText"></p>
     </div>
   </div>
-
   <div class="right">
     <div class="input-group">
       <label style="font-size: 1.4rem; font-weight: 700; color: #4a5568;">Show Advanced Settings</label>
@@ -172,7 +172,6 @@
       <button class="btn generate" onclick="saveSettings()">Save Settings</button>
     </div>
   </div>
-
   <script>
     document.getElementById("showSettingsToggle").addEventListener("change", () => {
       document.getElementById("settingsPanel").style.display = showSettingsToggle.checked ? "block" : "none";
@@ -215,8 +214,10 @@
       .then(res => res.json())
       .then(data => {
         document.getElementById("loadingSpinner").style.display = "none";
+
         if (typeof data.credits === "number") {
           document.getElementById("creditDisplay").innerText = data.credits + " Credits";
+
           if (data.credits === 0) {
             alert("⚠ You have no balance left.\n\nPlease contact admin on WhatsApp to add credits:\nhttps://wa.me/918830720742");
             document.querySelector(".generate").disabled = true;
@@ -261,24 +262,6 @@
       });
       alert("✅ Settings saved!");
     }
-
-    function loadSettings() {
-      const ids = ["businessName", "businessCategory", "replyLength", "signature", "enableSocialCTA", "ctaType", "ctaLink"];
-      ids.forEach(id => {
-        const el = document.getElementById(id);
-        const val = localStorage.getItem(id);
-        if (el && val !== null) {
-          if (el.type === "checkbox") {
-            el.checked = val === "true";
-          } else {
-            el.value = val;
-          }
-        }
-      });
-    }
-
-    window.addEventListener("DOMContentLoaded", loadSettings);
   </script>
 </body>
 </html>
-<!-- ✅ END -->
