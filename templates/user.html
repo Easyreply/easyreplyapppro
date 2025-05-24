@@ -1,3 +1,4 @@
+<!-- ✅ FINAL EasyReply user.html with centered spinner -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,12 +18,10 @@
     }
     .left, .right { padding: 2rem; overflow-y: auto; }
     .left {
-      width: 50%;
-      background: #ffffff;
+      width: 50%; background: #ffffff;
       box-shadow: 4px 0 20px rgba(0, 0, 0, 0.06);
       border-radius: 0 24px 24px 0;
-      display: flex;
-      flex-direction: column;
+      display: flex; flex-direction: column;
     }
     .right { width: 50%; background: #fcfcfd; }
     .header { display: flex; justify-content: space-between; align-items: center; }
@@ -75,9 +74,25 @@
       cursor: pointer; transition: all 0.2s;
     }
     .copy-btn.copied { background-color: #d0f0d6; color: #2f855a; }
+
+    #loadingSpinner {
+      text-align: center; width: 100%; margin-top: 1rem; display: none;
+    }
+    .spinner {
+      margin: 0 auto; display: inline-block;
+      width: 32px; height: 32px;
+      border: 3px solid #cbd5e0;
+      border-top: 3px solid #6b46c1;
+      border-radius: 50%; animation: spin 1s linear infinite;
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
     @media (max-width: 768px) {
       body { flex-direction: column; overflow-y: auto; height: auto; }
@@ -95,6 +110,7 @@
     </div>
     <div style="margin-top: 1rem; font-weight: 500;">Logged in as: <strong>{{ username }}</strong></div>
     <div class="credits" id="creditDisplay">{{ credits }} Credits</div>
+
     <div class="input-group">
       <label for="review">Paste your Business Review</label>
       <textarea id="review" placeholder="Google, Zomato, Tripadvisor, etc."></textarea>
@@ -114,10 +130,12 @@
     <button class="btn generate" onclick="showReply()">Generate Reply</button>
     <div style="margin-bottom: 1rem;"></div>
     <button class="btn clear" onclick="clearReply()">Clear</button>
-    <!-- ✅ Loading Spinner Centered -->
-    <div id="loadingSpinner" style="text-align:center; margin-top:1rem; display:none;">
-      <div class="spinner" style="width:32px; height:32px; border:3px solid #cbd5e0; border-top:3px solid #6b46c1; border-radius:50%; animation:spin 1s linear infinite;"></div>
+
+    <!-- ✅ Fixed Centered Spinner -->
+    <div id="loadingSpinner">
+      <div class="spinner"></div>
     </div>
+
     <div id="replyBox" class="reply-box" style="display: none;">
       <div class="reply-header">
         <strong>🧠 Generated Reply (SEO Friendly)</strong>
@@ -126,6 +144,7 @@
       <p id="replyText"></p>
     </div>
   </div>
+
   <div class="right">
     <div class="input-group">
       <label style="font-size: 1.4rem; font-weight: 700; color: #4a5568;">Show Advanced Settings</label>
@@ -172,6 +191,7 @@
       <button class="btn generate" onclick="saveSettings()">Save Settings</button>
     </div>
   </div>
+
   <script>
     document.getElementById("showSettingsToggle").addEventListener("change", () => {
       document.getElementById("settingsPanel").style.display = showSettingsToggle.checked ? "block" : "none";
